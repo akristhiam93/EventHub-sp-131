@@ -8,6 +8,7 @@ const API_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 const socket = io(API_URL, {
   transports: ["polling", "websocket"],
+  withCredentials: false,
 });
 
 export const Chat = () => {

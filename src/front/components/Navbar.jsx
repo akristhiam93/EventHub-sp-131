@@ -37,14 +37,11 @@ export const Navbar = () => {
         <nav className="navbar navbar-expand-xl">
           <div className="d-flex w-100 justify-content-between align-items-center">
             <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
-              <Link to="/" className="d-flex align-items-center gap-2 text-decoration-none">
-                 <img src={EventHubIcon} alt="EventHub" className="navbar-logo-img"/>
-
-                    <span className="navbar-brand mb-0 h1 navbar-logo-text">
-                       Event Hub
-                    </span>
-              </Link>
-			</Link>
+              <img src={EventHubIcon} alt="EventHub" className="navbar-logo-img"/>
+              <span className="navbar-brand mb-0 h1 navbar-logo-text">
+                Event Hub
+              </span>
+            </Link>
 
             <div className="d-none d-xl-block">
               <ul className="menu-list list-unstyled d-flex gap-4 navbar-nav mb-0">

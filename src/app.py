@@ -30,14 +30,23 @@ static_file_dir = os.path.join(os.path.dirname(
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
-# Allow CORS requests to this API
-allowed_origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",")]
+# In development the Vite preview can run on a changing Codespaces origin.
+# Production accepts only origins explicitly configured in CORS_ORIGINS.
+configured_origins = os.getenv("CORS_ORIGINS", "").strip()
+if configured_origins:
+    allowed_origins = [origin.strip() for origin in configured_origins.split(",") if origin.strip()]
+elif ENV == "development":
+    allowed_origins = "*"
+else:
+    allowed_origins = None
+
 socketio = SocketIO(app, cors_allowed_origins=allowed_origins)
 register_socket_events(socketio)
-CORS(app, resources={r"/api/*": {"origins": allowed_origins}},
-     allow_headers=["Content-Type", "Authorization"],
-     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-     supports_credentials=True)
+if allowed_origins is not None:
+    CORS(app, resources={r"/api/*": {"origins": allowed_origins}},
+         allow_headers=["Content-Type", "Authorization"],
+         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+         supports_credentials=False)
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
