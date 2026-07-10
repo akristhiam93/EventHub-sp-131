@@ -361,6 +361,8 @@ class Comment(db.Model):
             "id": self.id,
             "message": self.message,
             "create_date": self.create_date.isoformat(),
+            "user_id": self.user_id,
+            "event_id": self.event_id,
 
             "user": {
                 "id": self.user.id,

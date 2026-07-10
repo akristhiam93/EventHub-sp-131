@@ -217,7 +217,7 @@ export const EventDetails = () => {
                             <div key={comment.id} className="border-bottom py-2">
                                 <p className="mb-1">{comment.message}</p>
                                 <small className="text-muted">
-                                    Usuario ID: {comment.user_id}
+                                    Usuario: {comment.user?.name || "Desconocido"} · ID: {comment.user_id ?? comment.user?.id ?? "—"}
                                 </small>
                             </div>
                         ))
