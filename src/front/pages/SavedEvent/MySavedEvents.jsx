@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "../../components/dashboard/DashboardLayout";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
 export const MySavedEvents = () => {
     const [events, setEvents] = useState([]);

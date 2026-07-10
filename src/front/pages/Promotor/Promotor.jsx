@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 export const Promotor = () => {
     const { store, dispatch } = useGlobalReducer()
-    const urlAPI = import.meta.env.VITE_BACKEND_URL
+    const urlAPI = import.meta.env.VITE_BACKEND_URL || ""
     const [allPromotors, setAllPromotors] = useState([])
     const navigate = useNavigate();
     

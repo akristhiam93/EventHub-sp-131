@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
 export const DeleteComment = () => {
     const { id } = useParams();

@@ -11,7 +11,7 @@ export const CreateGroupEvent = () => {
 	const [groupId, setGroupId] = useState("");
 	const [eventId, setEventId] = useState("");
 
-	const backendUrl = import.meta.env.VITE_BACKEND_URL;
+	const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
 	const getGroups = () => {
 		fetch(`${backendUrl}/api/group`)

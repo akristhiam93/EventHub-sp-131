@@ -3,7 +3,7 @@ import { Link, useParams, Navigate } from "react-router-dom";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 
 export const GroupDetail = () => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const { theId } = useParams();
     const { store } = useGlobalReducer();
 

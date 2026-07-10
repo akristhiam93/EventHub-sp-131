@@ -4,7 +4,7 @@ import useGlobalReducer from "../../hooks/useGlobalReducer.jsx";
 
 export const EditGroup = () => {
 
-    const urlAPI = import.meta.env.VITE_BACKEND_URL
+    const urlAPI = import.meta.env.VITE_BACKEND_URL || ""
     const { store, dispatch } = useGlobalReducer()
     const [name, setName] = useState("")
     const [media, setMedia] = useState("")

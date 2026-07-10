@@ -4,7 +4,7 @@ import { Link, Navigate } from "react-router-dom";
 
 export const EventCategory = () => {
     const { store, dispatch } = useGlobalReducer()
-    const urlAPI = import.meta.env.VITE_BACKEND_URL
+    const urlAPI = import.meta.env.VITE_BACKEND_URL || ""
     const [allEventCategories, setAllEventCategories] = useState([])
 
     async function getEventCategories() {

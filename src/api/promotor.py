@@ -2,9 +2,19 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, Promotor, Event, EventPromotor, SavedEvent, EventCategory, EventAssistUser, GroupEvent, Category, Comment, User, Chat, Message
 from sqlalchemy import select
 from datetime import datetime, timezone
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, verify_jwt_in_request
+from api.security import current_account_id, current_role, hash_password, issue_token, verify_password
 
 promotor = Blueprint('promotor', __name__,)
+
+
+@promotor.before_request
+def require_promotor_role():
+    if request.endpoint in {"promotor.login_promotor", "promotor.signUp_promotor"}:
+        return None
+    verify_jwt_in_request()
+    if current_role() != "promotor":
+        return jsonify({"message": "Se requiere una cuenta de promotor"}), 403
 
 # // Promotor Auth
 
@@ -19,8 +29,11 @@ def login_promotor():
     if email == None or password == None:
         return jsonify({"msg": "Bad email or password"}), 401
     for promot in promotors:
-        if email in promot.email and password == promot.password:
-            access_token = create_access_token(identity=email)
+        if email == promot.email and verify_password(promot.password, password):
+            if not promot.password.startswith(("pbkdf2:", "scrypt:")):
+                promot.password = hash_password(password)
+                db.session.commit()
+            access_token = issue_token(promot, "promotor")
             return jsonify(access_token=access_token), 200
 
     return jsonify({"msg": "Bad email or password"}), 401
@@ -29,11 +42,11 @@ def login_promotor():
 @promotor.route('/private', methods=['GET'])
 @jwt_required()
 def private_promotor():
-    current_user_email = get_jwt_identity()
-    promotDb = db.session.execute(select(Promotor).where(
-        Promotor.email == current_user_email)).scalars().all()
-
-    promot = db.session.get(Promotor, promotDb[0].id)
+    if current_role() != "promotor":
+        return jsonify({"msg": "No tienes permisos para esta ruta"}), 403
+    promot = db.session.get(Promotor, current_account_id())
+    if promot is None:
+        return jsonify({"msg": "Promotor no encontrado"}), 404
 
     return jsonify({
         "msg": "Token valid",
@@ -54,6 +67,7 @@ def signUp_promotor():
             return {"msg": "invalid phone"}, 409
         if promotor.web_page == body["web_page"]:
             return {"msg": "invalid web page url"}, 409
+    body["password"] = hash_password(body["password"])
     promotor = Promotor(**body, verified_org=False)
     db.session.add(promotor)
     db.session.commit()
@@ -109,6 +123,9 @@ def create_event(promotor_id):
     body = request.get_json(silent=True)
     promotor = db.session.get(Promotor, promotor_id)
 
+    if current_account_id() != promotor_id:
+        return jsonify({"message": "No tienes permiso para crear eventos para este promotor"}), 403
+
     if body is None:
         return jsonify({"message": "Debes enviar un JSON válido"}), 400
 
@@ -145,41 +162,12 @@ def create_event(promotor_id):
         capacity=capacity,
         media=media
     )
+    if not promotor:
+        return jsonify({"message": "Promotor no existe"}), 404
+
     db.session.add(new_event)
-
-    db.session.commit()
-
-    event = db.session.execute(select(Event).where(
-        Event.create_date == new_event.create_date)).scalar_one_or_none()
-    print("esto es event ", event.serialize())
-
-    if not promotor_id or not event.id:
-        return jsonify({"message": "promotor_id y event_id son obligatorios"}), 400
-
-    # validar existencia
-    promotor = db.session.get(Promotor, promotor_id)
-    event = db.session.get(Event, event.id)
-
-    if not promotor or not event:
-        return jsonify({"message": "Promotor o Event no existen"}), 404
-
-    # evitar duplicados
-    existing = db.session.execute(
-        select(EventPromotor).where(
-            EventPromotor.promotor_id == promotor_id,
-            EventPromotor.event_id == event.id
-        )
-    ).scalar_one_or_none()
-
-    if existing:
-        return jsonify({"message": "La relación ya existe"}), 409
-
-    new_relation = EventPromotor(
-        promotor_id=promotor_id,
-        event_id=event.id
-    )
-    print("esto es new_relation ", new_relation.serialize())
-
+    db.session.flush()
+    new_relation = EventPromotor(promotor_id=promotor_id, event_id=new_event.id)
     db.session.add(new_relation)
     db.session.commit()
 
@@ -193,6 +181,14 @@ def create_event(promotor_id):
 @promotor.route("/<int:promotor_id>/events/<int:event_id>", methods=["PUT"])
 @jwt_required()
 def update_event(promotor_id, event_id):
+    if current_account_id() != promotor_id:
+        return jsonify({"message": "No tienes permiso para modificar este evento"}), 403
+    owns_event = db.session.execute(select(EventPromotor).where(
+        EventPromotor.promotor_id == promotor_id,
+        EventPromotor.event_id == event_id
+    )).scalar_one_or_none()
+    if owns_event is None:
+        return jsonify({"message": "El evento no pertenece a este promotor"}), 403
     event = db.session.get(Event, event_id)
 
     if event is None:
@@ -249,6 +245,14 @@ def update_event(promotor_id, event_id):
 @promotor.route("/<int:promotor_id>/events/<int:event_id>", methods=["DELETE"])
 @jwt_required()
 def delete_event(promotor_id, event_id):
+    if current_account_id() != promotor_id:
+        return jsonify({"message": "No tienes permiso para eliminar este evento"}), 403
+    owns_event = db.session.execute(select(EventPromotor).where(
+        EventPromotor.promotor_id == promotor_id,
+        EventPromotor.event_id == event_id
+    )).scalar_one_or_none()
+    if owns_event is None:
+        return jsonify({"message": "El evento no pertenece a este promotor"}), 403
     event = db.session.get(Event, event_id)
     promotor = db.session.get(Promotor, promotor_id)
 
@@ -423,13 +427,9 @@ def delete_comment(id, event_id):
 
 
 def get_current_promotor():
-    current_promotor_email = get_jwt_identity()
-
-    promotor = db.session.execute(
-        select(Promotor).where(Promotor.email == current_promotor_email)
-    ).scalar_one_or_none()
-
-    return promotor
+    if current_role() != "promotor":
+        return None
+    return db.session.get(Promotor, current_account_id())
 
 @promotor.route("/chats", methods=["GET"])
 @jwt_required()

@@ -5,7 +5,7 @@ import EventCard from "./EventCard";
 const  SwipeDeck = () => {
   const [events, setEvents] = useState([]);
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
   const token = localStorage.getItem("tokenUser");
 
   useEffect(() => {

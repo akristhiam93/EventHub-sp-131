@@ -5,7 +5,7 @@ import { use } from "react";
 
 export const CreateEventCategory = () => {
 
-    const urlAPI = import.meta.env.VITE_BACKEND_URL
+    const urlAPI = import.meta.env.VITE_BACKEND_URL || ""
     const [selectedIDEvent, setSelectedIDEvent] = useState("")
     const [selectedIDCategroy, setSelectedIDCategroy] = useState("")
     const [allEvents, setAllEvents] = useState([])

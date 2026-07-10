@@ -20,7 +20,7 @@ export const LoginUser = () => {
     function handleLogin(e) {
         e.preventDefault();
 
-        fetch(import.meta.env.VITE_BACKEND_URL + "/api/user/login", {
+        fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/user/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

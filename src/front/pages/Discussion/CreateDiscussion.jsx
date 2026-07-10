@@ -5,7 +5,7 @@ import { use } from "react";
 
 export const CreateDiscussion = () => {
 
-    const urlAPI = import.meta.env.VITE_BACKEND_URL
+    const urlAPI = import.meta.env.VITE_BACKEND_URL || ""
     const [selectedIDUser, setSelectedIDUser] = useState("")
     const [selectedIDGroup, setSelectedIDGroup] = useState("")
     const [allUsers, setAllUsers] = useState([])

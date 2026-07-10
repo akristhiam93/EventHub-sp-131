@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
 export const CreateEventPromotor = () => {
   const navigate = useNavigate();

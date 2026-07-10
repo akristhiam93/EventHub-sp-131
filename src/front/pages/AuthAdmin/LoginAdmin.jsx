@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 export const LoginAdmin = () => {
   const navigate = useNavigate();
-  const urlApi = import.meta.env.VITE_BACKEND_URL;
+  const urlApi = import.meta.env.VITE_BACKEND_URL || "";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,10 +13,8 @@ export const LoginAdmin = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-    console.log("URL BACKEND:", urlApi);
-
     try {
-      const res = await fetch(`${urlApi}api/admin/login`, {
+      const res = await fetch(`${urlApi}/api/admin/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -25,13 +23,11 @@ export const LoginAdmin = () => {
       });
 
       const data = await res.json();
-      console.log("RESPUESTA LOGIN:", data);
       if (!res.ok) {
         throw new Error(data.msg || "Error en login");
       }
 
       localStorage.setItem("tokenAdmin", data.token);
-      console.log("TOKEN GUARDADO:", data.token);
       localStorage.setItem("adminAuth", "true");
 
       navigate("/admin/private");

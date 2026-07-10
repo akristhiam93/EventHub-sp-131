@@ -4,7 +4,7 @@ import useGlobalReducer from "../../hooks/useGlobalReducer";
 
 
 const CreateEventAssist = () => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
   const [users, setUsers] = useState([]);
   const [events, setEvents] = useState([]);
   const [userId, setUserId] = useState("");

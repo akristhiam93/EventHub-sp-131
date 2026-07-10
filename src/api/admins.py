@@ -1,10 +1,20 @@
 from flask import request, jsonify, Blueprint
-from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, verify_jwt_in_request
 from sqlalchemy import select
 from api.models import db, Admin
+from api.security import current_account_id, current_role, hash_password, issue_token, verify_password
 
 
 admins = Blueprint('admins', __name__)
+
+
+@admins.before_request
+def require_admin_role():
+    if request.endpoint == "admins.login_admin":
+        return None
+    verify_jwt_in_request()
+    if current_role() != "admin":
+        return jsonify({"message": "Se requiere rol de administrador"}), 403
 
 
 @admins.route('/admin/login', methods=['POST'])
@@ -24,13 +34,13 @@ def login_admin():
     if not admin:
         return jsonify({"msg": "Credenciales inválidas"}), 401
 
-    if admin.password != password:
+    if not verify_password(admin.password, password):
         return jsonify({"msg": "Credenciales inválidas"}), 401
 
-    token = create_access_token(
-    identity=str(admin.id),
-    additional_claims={"role": "admin"}
-    )
+    if not admin.password.startswith(("pbkdf2:", "scrypt:")):
+        admin.password = hash_password(password)
+        db.session.commit()
+    token = issue_token(admin, "admin")
 
     return jsonify({
         "token": token,
@@ -41,9 +51,9 @@ def login_admin():
 @admins.route('/admin/private', methods=['GET'])
 @jwt_required()
 def private_admin():
-    admin_id = get_jwt_identity()
-
-    admin = db.session.get(Admin, admin_id)
+    if current_role() != "admin":
+        return jsonify({"msg": "No tienes permisos para esta ruta"}), 403
+    admin = db.session.get(Admin, current_account_id())
 
     if not admin:
         return jsonify({"msg": "Admin no encontrado"}), 404

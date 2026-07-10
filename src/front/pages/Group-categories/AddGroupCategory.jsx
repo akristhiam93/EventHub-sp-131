@@ -16,7 +16,7 @@ export const AddGroupCategory = () => {
 	});
 
 	const getGroups = () => {
-		fetch(import.meta.env.VITE_BACKEND_URL + "/api/groups")
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/groups")
 			.then((response) => response.json())
 			.then((data) => {
 				setGroups(data);
@@ -25,7 +25,7 @@ export const AddGroupCategory = () => {
 	};
 
 	const getCategories = () => {
-		fetch(import.meta.env.VITE_BACKEND_URL + "/api/categories")
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/categories")
 			.then((response) => response.json())
 			.then((data) => {
 				setCategories(data);
@@ -48,7 +48,7 @@ export const AddGroupCategory = () => {
 	const handleSubmit = (event) => {
 		event.preventDefault();
 
-		fetch(import.meta.env.VITE_BACKEND_URL + "/api/group-categories", {
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/group-categories", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"

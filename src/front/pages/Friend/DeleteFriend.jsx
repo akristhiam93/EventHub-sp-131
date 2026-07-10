@@ -4,7 +4,7 @@ import useGlobalReducer from "../../hooks/useGlobalReducer";
 
 export const DeleteFriend = () => {
 
-    const urlAPI = import.meta.env.VITE_BACKEND_URL
+    const urlAPI = import.meta.env.VITE_BACKEND_URL || ""
     const { theId } = useParams()
     const navigate = useNavigate()
     const { store } = useGlobalReducer();

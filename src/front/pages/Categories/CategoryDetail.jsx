@@ -8,7 +8,7 @@ export const CategoryDetail = () => {
 	const { store } = useGlobalReducer();
 
 	useEffect(() => {
-		fetch(import.meta.env.VITE_BACKEND_URL + "/api/categories/" + id)
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/categories/" + id)
 			.then((resp) => resp.json())
 			.then((data) => setCategory(data))
 			.catch((error) => console.log(error));

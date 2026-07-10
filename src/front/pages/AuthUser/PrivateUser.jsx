@@ -15,7 +15,7 @@ export const PrivateUser = () => {
       return;
     }
 
-    fetch(import.meta.env.VITE_BACKEND_URL + "/api/private", {
+    fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/private", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

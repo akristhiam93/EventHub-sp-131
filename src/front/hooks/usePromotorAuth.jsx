@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useGlobalReducer from "./useGlobalReducer";
 
-const urlApi = import.meta.env.VITE_BACKEND_URL;
+const urlApi = import.meta.env.VITE_BACKEND_URL || "";
 
 export function usePromotorAuth() {
     const { dispatch } = useGlobalReducer();
@@ -9,7 +9,7 @@ export function usePromotorAuth() {
     const [loading, setLoading] = useState(true);
     const [isAuthorized, setIsAuthorized] = useState(null);
     useEffect(() => {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("tokenPromotor") || localStorage.getItem("token");
         if (!token) {
             setIsAuthorized(false);
             setLoading(false);

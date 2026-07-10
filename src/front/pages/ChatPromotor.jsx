@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 import { ChatSidebar } from "../components/chat/ChatSidebar";
 import { ChatWindow } from "../components/chat/ChatWindow";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL;
+const API_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 const socket = io(API_URL, {
   transports: ["websocket", "polling"],

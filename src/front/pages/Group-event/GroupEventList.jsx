@@ -9,7 +9,7 @@ export const GroupEventList = () => {
 	const { store } = useGlobalReducer();
 
 
-	const backendUrl = import.meta.env.VITE_BACKEND_URL;
+	const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
 	const getRelations = () => {
 		fetch(`${backendUrl}/api/group-event`)

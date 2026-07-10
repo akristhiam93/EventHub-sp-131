@@ -8,9 +8,24 @@ from flask_cors import CORS
 from sqlalchemy import select
 from datetime import datetime, timezone
 from api.utils import generate_sitemap, APIException
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, verify_jwt_in_request
+from api.security import current_account_id, current_role, hash_password, issue_token, require_roles, verify_password
 
 api = Blueprint('api', __name__)
+
+
+@api.before_request
+def protect_legacy_mutations():
+    """Legacy CRUD endpoints are administrative unless explicitly self-service."""
+    if request.method not in {"POST", "PUT", "PATCH", "DELETE"}:
+        return None
+    if request.endpoint in {"api.create_user", "api.create_promotor", "api.login_user"}:
+        return None
+    verify_jwt_in_request()
+    if request.endpoint == "api.update_user":
+        return None
+    if current_role() != "admin":
+        return jsonify({"message": "Se requiere rol de administrador"}), 403
 
 
 @api.route("/users", methods=["GET"])
@@ -61,7 +76,7 @@ def create_user():
     new_user = User(
         name=name,
         email=email,
-        password=password,
+        password=hash_password(password),
         location=location,
         age=age,
         description=description,
@@ -78,7 +93,10 @@ def create_user():
 
 
 @api.route("/users/<int:user_id>", methods=["PUT"])
+@jwt_required()
 def update_user(user_id):
+    if current_role() != "admin" and current_account_id() != user_id:
+        return jsonify({"message": "No tienes permiso para modificar este usuario"}), 403
     user = db.session.get(User, user_id)
 
     if user is None:
@@ -103,7 +121,7 @@ def update_user(user_id):
         user.email = body["email"]
 
     if "password" in body and body["password"]:
-        user.password = body["password"]
+        user.password = hash_password(body["password"])
 
     if "name" in body:
         user.name = body["name"]
@@ -129,6 +147,7 @@ def update_user(user_id):
 
 
 @api.route("/users/<int:user_id>", methods=["DELETE"])
+@require_roles("admin")
 def delete_user(user_id):
     user = db.session.get(User, user_id)
 
@@ -148,6 +167,7 @@ def delete_user(user_id):
 
 
 @api.route("/admin-panel/admins", methods=["GET"])
+@require_roles("admin")
 def get_admins():
     admins = db.session.execute(
         select(Admin)
@@ -161,6 +181,7 @@ def get_admins():
 
 # LEER UN ADMIN
 @api.route("/admin-panel/admins/<int:admin_id>", methods=["GET"])
+@require_roles("admin")
 def get_admin(admin_id):
     admin = db.session.get(Admin, admin_id)
 
@@ -175,6 +196,7 @@ def get_admin(admin_id):
 
 # CREAR ADMIN
 @api.route("/admin-panel/admins", methods=["POST"])
+@require_roles("admin")
 def create_admin():
     body = request.get_json(silent=True)
 
@@ -197,7 +219,7 @@ def create_admin():
 
     new_admin = Admin(
         email=email,
-        password=password,
+        password=hash_password(password),
         is_active=is_active
     )
 
@@ -212,6 +234,7 @@ def create_admin():
 
 # EDITAR ADMIN
 @api.route("/admin-panel/admins/<int:admin_id>", methods=["PUT"])
+@require_roles("admin")
 def update_admin(admin_id):
     admin = db.session.get(Admin, admin_id)
 
@@ -237,7 +260,7 @@ def update_admin(admin_id):
         admin.email = body["email"]
 
     if "password" in body and body["password"]:
-        admin.password = body["password"]
+        admin.password = hash_password(body["password"])
 
     if "is_active" in body:
         admin.is_active = body["is_active"]
@@ -252,6 +275,7 @@ def update_admin(admin_id):
 
 # ELIMINAR ADMIN
 @api.route("/admin-panel/admins/<int:admin_id>", methods=["DELETE"])
+@require_roles("admin")
 def delete_admin(admin_id):
     admin = db.session.get(Admin, admin_id)
 
@@ -311,6 +335,7 @@ def create_promotor():
     if "password" not in body or body["password"] == "":
         return jsonify("Password missing"), 400
 
+    body["password"] = hash_password(body["password"])
     promotor = Promotor(**body, verified_org=False)
 
     db.session.add(promotor)
@@ -339,7 +364,7 @@ def edit_promotor_by_id(position):
     if "emailpassword" in body:
         promotor.email = body["email"]
     if "password" in body:
-        promotor.password = body["password"]
+        promotor.password = hash_password(body["password"])
     if "location" in body:
         promotor.location = body["location"]
     if "phone" in body:
@@ -1633,13 +1658,11 @@ def login_user():
         return jsonify({"msg": "Bad email or password"}), 401
 
     for user in users:
-        print(email == user.email)
-        print(password)
-        print(user.password)
-        print(password == user.password)
-
-        if email == user.email and password == user.password:
-            access_token = create_access_token(identity=email)
+        if email == user.email and verify_password(user.password, password):
+            if not user.password.startswith(("pbkdf2:", "scrypt:")):
+                user.password = hash_password(password)
+                db.session.commit()
+            access_token = issue_token(user, "user")
             return jsonify({
                 "token": access_token,
                 "user": user.serialize()
@@ -1651,13 +1674,11 @@ def login_user():
 @api.route("/private", methods=["GET"])
 @jwt_required()
 def private_user():
-    current_user_email = get_jwt_identity()
-
-    userDb = db.session.execute(
-        select(User).where(User.email == current_user_email)
-    ).scalars().all()
-
-    user = db.session.get(User, userDb[0].id)
+    if current_role() != "user":
+        return jsonify({"msg": "No tienes permisos para esta ruta"}), 403
+    user = db.session.get(User, current_account_id())
+    if user is None:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
 
     return jsonify({
         "msg": "Token valid",

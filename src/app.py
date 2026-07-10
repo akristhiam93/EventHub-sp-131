@@ -31,9 +31,10 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 
 # Allow CORS requests to this API
-socketio = SocketIO(app, cors_allowed_origins="*")
+allowed_origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",")]
+socketio = SocketIO(app, cors_allowed_origins=allowed_origins)
 register_socket_events(socketio)
-CORS(app, resources={r"/api/*": {"origins": "*"}},
+CORS(app, resources={r"/api/*": {"origins": allowed_origins}},
      allow_headers=["Content-Type", "Authorization"],
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
      supports_credentials=True)
@@ -51,9 +52,11 @@ MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
 
 with app.app_context():
-    db.create_all()
+    if ENV == "development":
+        db.create_all()
 # add the admin
-setup_admin(app)
+if os.getenv("ENABLE_FLASK_ADMIN") == "1":
+    setup_admin(app)
 
 # add the admin
 setup_commands(app)
@@ -68,7 +71,11 @@ app.register_blueprint(category, url_prefix='/api')
 app.register_blueprint(user, url_prefix='/api')
 app.register_blueprint(image_search, url_prefix="/api")
 
-app.config["JWT_SECRET_KEY"] = "super-secret-status-python-flask-token-secure-private"
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+if not app.config["JWT_SECRET_KEY"]:
+    if ENV == "production":
+        raise RuntimeError("JWT_SECRET_KEY debe configurarse en producción")
+    app.config["JWT_SECRET_KEY"] = "development-only-change-me-please-replace-with-real-secret"
 jwt = JWTManager(app)
 
 # Handle/serialize errors like a JSON object

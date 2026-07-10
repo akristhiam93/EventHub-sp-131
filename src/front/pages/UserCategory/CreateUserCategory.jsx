@@ -5,7 +5,7 @@ import { use } from "react";
 
 export const CreateUserCategory = () => {
 
-    const urlAPI = import.meta.env.VITE_BACKEND_URL
+    const urlAPI = import.meta.env.VITE_BACKEND_URL || ""
     const [selectedIDUser, setSelectedIDUser] = useState("")
     const [selectedIDCategory, setSelectedIDCategory] = useState("")
     const [allUsers, setAllUsers] = useState([])

@@ -7,7 +7,7 @@ import CloudinaryUploadWidget from "../CloudinaryUploadWidget";
 import { Map } from "../Map";
 import { useArtistSearch } from "../../hooks/useArtistSearch";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 const geoApiKey = import.meta.env.VITE_GEOCODING_API_KEY;
 
 const cloudName = 'dxv6ytl25';

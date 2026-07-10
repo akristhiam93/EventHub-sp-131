@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams, Navigate } from "react-router-dom";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 
 export const EditAdmin = () => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const navigate = useNavigate();
     const { id } = useParams();
     const { store } = useGlobalReducer();

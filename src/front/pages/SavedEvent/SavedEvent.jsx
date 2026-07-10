@@ -4,7 +4,7 @@ import { Link, Navigate } from "react-router-dom";
 
 export const SavedEvent = () => {
     const { store, dispatch } = useGlobalReducer()
-    const urlAPI = import.meta.env.VITE_BACKEND_URL
+    const urlAPI = import.meta.env.VITE_BACKEND_URL || ""
     const [allSavedEvents, setAllSavedEvents] = useState([])
 
     async function getSavedEvents() {

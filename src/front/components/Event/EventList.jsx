@@ -1,7 +1,7 @@
 import { useEffect, useState, forwardRef, useImperativeHandle, useCallback } from "react";
 import { Link, } from "react-router-dom";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
 export const EventList = forwardRef((props, ref) => {
     const [events, setEvents] = useState([]);

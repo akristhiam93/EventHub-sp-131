@@ -8,7 +8,9 @@ from .models import db
 
 
 def setup_admin(app):
-    app.secret_key = os.environ.get("FLASK_APP_KEY", "sample key")
+    app.secret_key = os.environ.get("FLASK_APP_KEY")
+    if not app.secret_key:
+        raise RuntimeError("FLASK_APP_KEY debe configurarse al habilitar Flask-Admin")
 
     admin = FlaskAdmin(
         app,

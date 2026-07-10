@@ -10,7 +10,7 @@ export const CategoryCreate = () => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 
-		fetch(import.meta.env.VITE_BACKEND_URL + "/api/categories", {
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/categories", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"

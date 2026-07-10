@@ -4,7 +4,7 @@ import { useNavigate, Navigate } from "react-router-dom";
 
 export const CreateFriend = () => {
 
-    const urlAPI = import.meta.env.VITE_BACKEND_URL
+    const urlAPI = import.meta.env.VITE_BACKEND_URL || ""
     const [selectedIDUser, setSelectedIDUser] = useState("")
     const [selectedIDFriend, setSelectedIDFriend] = useState("")
     const [allFriends, setAllFriends] = useState([])

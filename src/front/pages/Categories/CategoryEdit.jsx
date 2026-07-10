@@ -9,7 +9,7 @@ export const CategoryEdit = () => {
 	const { store } = useGlobalReducer();
 
 	useEffect(() => {
-		fetch(import.meta.env.VITE_BACKEND_URL + "/api/categories/" + id)
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/categories/" + id)
 			.then((resp) => resp.json())
 			.then((data) => setName(data.name))
 			.catch((error) => console.log(error));
@@ -18,7 +18,7 @@ export const CategoryEdit = () => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 
-		fetch(import.meta.env.VITE_BACKEND_URL + "/api/categories/" + id, {
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/categories/" + id, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json"

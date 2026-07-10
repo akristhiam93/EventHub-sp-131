@@ -4,7 +4,7 @@ import useGlobalReducer from "../../hooks/useGlobalReducer";
 
 
 export const User = () => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const [users, setUsers] = useState([]);
     const location = useLocation();
     const { store } = useGlobalReducer();

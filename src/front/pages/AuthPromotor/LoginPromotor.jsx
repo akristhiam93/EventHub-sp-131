@@ -6,7 +6,7 @@ import FestivalPromotor from "../../assets/img/FestivalPromotor.jpg";
 
 export const LoginPromotor = () => {
   const { store, dispatch } = useGlobalReducer()
-  const urlApi = import.meta.env.VITE_BACKEND_URL
+  const urlApi = import.meta.env.VITE_BACKEND_URL || ""
   const [email, setEmail] = useState("")
   const [pw, setPw] = useState("")
   const [tokenApi, setTokenApi] = useState("")
@@ -34,8 +34,11 @@ export const LoginPromotor = () => {
         throw new Error("Error on post fetch, status: ", response.status)
       }
       const token = (await response.json()).access_token
-      localStorage.setItem("token", token)
+      localStorage.setItem("token", token) // Compatibility with existing promotor screens.
+      localStorage.setItem("tokenPromotor", token)
+      localStorage.setItem("promotorAuth", "true")
       dispatch({ type: "ADD_TOKEN_PROMOTOR", payload: token })
+      dispatch({ type: "ADD_LOGIN_STATUS_PROMOTOR", payload: true })
       setTimeout(() => {
         if (response.ok) {
           navigate('/promotor/private');
@@ -50,12 +53,13 @@ export const LoginPromotor = () => {
 
   useEffect(() => {
     if (localStorage.getItem("token") != null && localStorage.getItem("token") != "") {
-      setTokenApi(localStorage.getItem("token"))
-      dispatch({ type: "ADD_TOKEN_PROMOTOR", payload: localStorage.getItem("token") })
+      const savedToken = localStorage.getItem("tokenPromotor") || localStorage.getItem("token")
+      setTokenApi(savedToken)
+      dispatch({ type: "ADD_TOKEN_PROMOTOR", payload: savedToken })
     }
 
     if (localStorage.getItem("promotorAuth") === "true") {
-      dispatch({ type: "ADD_LOGIN_STATUS_PROMOTOR", payload: localStorage.getItem("promotorAuth") })
+      dispatch({ type: "ADD_LOGIN_STATUS_PROMOTOR", payload: true })
     }
   }, [])
 

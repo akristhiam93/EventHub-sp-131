@@ -2,7 +2,7 @@ import useGlobalReducer from "../../hooks/useGlobalReducer";
 import { useNavigate, useParams, Navigate } from "react-router-dom";
 
 export const DeleteUser = () => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const { id } = useParams();
     const navigate = useNavigate();
     const { store } = useGlobalReducer();

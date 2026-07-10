@@ -3,7 +3,7 @@ import { useNavigate, Navigate } from "react-router-dom";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 
 const EventAssistUser = () => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
   const [assists, setAssists] = useState([]);
   const navigate = useNavigate();
   const { store } = useGlobalReducer();

@@ -15,7 +15,7 @@ export const EditGroupCategory = () => {
 	});
 
 	const getGroups = () => {
-		fetch(import.meta.env.VITE_BACKEND_URL + "/api/groups")
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/groups")
 			.then((response) => response.json())
 			.then((data) => {
 				setGroups(data);
@@ -24,7 +24,7 @@ export const EditGroupCategory = () => {
 	};
 
 	const getCategories = () => {
-		fetch(import.meta.env.VITE_BACKEND_URL + "/api/categories")
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/categories")
 			.then((response) => response.json())
 			.then((data) => {
 				setCategories(data);
@@ -33,7 +33,7 @@ export const EditGroupCategory = () => {
 	};
 
 	const getOneRelation = () => {
-		fetch(import.meta.env.VITE_BACKEND_URL + `/api/group-categories/${id}`)
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + `/api/group-categories/${id}`)
 			.then((response) => response.json())
 			.then((data) => {
 				setFormData({
@@ -60,7 +60,7 @@ export const EditGroupCategory = () => {
 	const handleSubmit = (event) => {
 		event.preventDefault();
 
-		fetch(import.meta.env.VITE_BACKEND_URL + `/api/group-categories/${id}`, {
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + `/api/group-categories/${id}`, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json"

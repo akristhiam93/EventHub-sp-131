@@ -7,7 +7,7 @@ export const GroupCategoryList = () => {
 	const { store } = useGlobalReducer();
 
 	const getRelations = () => {
-		fetch(import.meta.env.VITE_BACKEND_URL + "/api/group-categories")
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/group-categories")
 			.then((response) => response.json())
 			.then((data) => {
 				setRelations(data);
@@ -16,7 +16,7 @@ export const GroupCategoryList = () => {
 	};
 
 	const deleteRelation = (id) => {
-		fetch(import.meta.env.VITE_BACKEND_URL + `/api/group-categories/${id}`, {
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + `/api/group-categories/${id}`, {
 			method: "DELETE"
 		})
 			.then((response) => response.json())

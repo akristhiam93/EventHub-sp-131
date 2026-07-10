@@ -6,7 +6,7 @@ import FestivalPromotor from "../../assets/img/FestivalPromotor.jpg";
 
 export const PromotorSignUp = () => {
   const { store, dispatch } = useGlobalReducer()
-  const urlApi = import.meta.env.VITE_BACKEND_URL
+  const urlApi = import.meta.env.VITE_BACKEND_URL || ""
   const [email, setEmail] = useState("")
   const [pw, setPw] = useState("")
   const [name, setName] = useState("")

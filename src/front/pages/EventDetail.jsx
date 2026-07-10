@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "../components/dashboard/DashboardLayout";
 import { usePromotorAuth } from "../hooks/usePromotorAuth";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
 export const EventDetail = () => {
     const { profileInfo, loading } = usePromotorAuth();

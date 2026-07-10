@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify, url_for, Blueprint
 from sqlalchemy import select
 from datetime import datetime, timezone
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request
+from api.security import current_account_id, current_role
 from api.routes import api
 from api.models import (db, User, Event, Comment, SavedEvent, EventAssistUser,
                         Group, Discussion, Friend, Promotor, Chat, Message, EventPromotor)
@@ -9,14 +10,17 @@ from api.models import (db, User, Event, Comment, SavedEvent, EventAssistUser,
 api = Blueprint('user', __name__,)
 
 
+@api.before_request
+def require_user_role():
+    verify_jwt_in_request()
+    if current_role() != "user":
+        return jsonify({"message": "Se requiere una cuenta de usuario"}), 403
+
+
 def get_current_user():
-    current_user_email = get_jwt_identity()
-
-    user = db.session.execute(
-        select(User).where(User.email == current_user_email)
-    ).scalar_one_or_none()
-
-    return user
+    if current_role() != "user":
+        return None
+    return db.session.get(User, current_account_id())
 
 
 @api.route("/me", methods=["GET"])

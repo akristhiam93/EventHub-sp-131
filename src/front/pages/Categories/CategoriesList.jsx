@@ -7,14 +7,14 @@ export const CategoriesList = () => {
 	const { store } = useGlobalReducer();
 
 	const loadCategories = () => {
-		fetch(import.meta.env.VITE_BACKEND_URL + "/api/categories")
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/categories")
 			.then((resp) => resp.json())
 			.then((data) => setCategories(data))
 			.catch((error) => console.log(error));
 	};
 
 	const deleteCategory = (id) => {
-		fetch(import.meta.env.VITE_BACKEND_URL + "/api/categories/" + id, {
+		fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/categories/" + id, {
 			method: "DELETE"
 		})
 			.then((resp) => resp.json())

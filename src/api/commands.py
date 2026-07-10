@@ -6,6 +6,7 @@ import click
 import random
 from sqlalchemy import select, func
 from api.models import db, User, Admin, Promotor, Category, Event, Group, PromotorCategory, Friend, SavedEvent, Discussion, GroupCategory, UserCategory, Comment, EventCategory, GroupEvent, EventAssistUser, EventPromotor
+from api.security import hash_password
 
 """
 In this file, you can add as many commands as you want using the @app.cli.command decorator
@@ -52,6 +53,18 @@ def generate_random_point_in_circle(center_lat, center_lng, radius_km):
 
 def setup_commands(app):
 
+    @app.cli.command("migrate-passwords")
+    def migrate_passwords():
+        """One-time migration of legacy plaintext passwords to secure hashes."""
+        migrated = 0
+        for model in (User, Admin, Promotor):
+            for account in db.session.execute(select(model)).scalars():
+                if not account.password.startswith(("pbkdf2:", "scrypt:")):
+                    account.password = hash_password(account.password)
+                    migrated += 1
+        db.session.commit()
+        print(f"Migrated {migrated} password(s).")
+
     @app.cli.command("insert-test-users")
     @click.argument("count")
     def insert_test_users(count):
@@ -67,7 +80,7 @@ def setup_commands(app):
                 user = User()
                 user.name = f"User {x}"
                 user.email = email
-                user.password = "123456"
+                user.password = hash_password("123456")
                 user.is_active = True
                 db.session.add(user)
                 db.session.commit()
@@ -92,7 +105,7 @@ def setup_commands(app):
             try:
                 admin = Admin()
                 admin.email = email
-                admin.password = "123456"
+                admin.password = hash_password("123456")
                 admin.is_active = True
                 db.session.add(admin)
                 db.session.commit()
@@ -118,7 +131,7 @@ def setup_commands(app):
                 promotor = Promotor()
                 promotor.name = f"Promotor {x}"
                 promotor.email = email
-                promotor.password = "123456"
+                promotor.password = hash_password("123456")
                 promotor.location = "Some Place"
                 promotor.web_page = f"www.somePage{x}.com"
                 promotor.verified_org = True

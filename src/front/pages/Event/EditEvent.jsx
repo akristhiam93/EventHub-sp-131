@@ -8,7 +8,7 @@ import { Map } from "../../components/Map";
 import { useArtistSearch } from "../../hooks/useArtistSearch";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 const geoApiKey = import.meta.env.VITE_GEOCODING_API_KEY;
 
 const cloudName = 'dxv6ytl25';
@@ -41,7 +41,7 @@ export const EditEvent = () => {
     const [eventCat, setEventCat] = useState(null);
     const [categories, setCategories] = useState(null);
     const [imgFromApi, setImgFromApi] = useState("");
-    const authApiA = import.meta.env.VITE_BACKEND_URL
+    const authApiA = import.meta.env.VITE_BACKEND_URL || ""
     console.log(latitude);
     console.log(longitude);
 

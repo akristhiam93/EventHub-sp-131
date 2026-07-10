@@ -3,7 +3,7 @@ import { Link, Navigate } from "react-router-dom";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 
 export const Admin = () => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const [admins, setAdmins] = useState([]);
     const [message, setMessage] = useState("");
     const { store } = useGlobalReducer();

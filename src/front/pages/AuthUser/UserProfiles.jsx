@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import { DashboardLayout } from "../../components/dashboard/DashboardLayout";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
 export const UserProfiles = () => {
     const [users, setUsers] = useState([]);

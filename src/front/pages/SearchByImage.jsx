@@ -56,7 +56,7 @@ export const SearchByImage = () => {
                     throw new Error("Cloudinary no devolvió una URL válida.");
                 }
 
-                return fetch(import.meta.env.VITE_BACKEND_URL + "/api/search-by-image", {
+                return fetch((import.meta.env.VITE_BACKEND_URL || "") + "/api/search-by-image", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

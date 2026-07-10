@@ -5,7 +5,7 @@ import { DashboardLayout } from "../../components/dashboard/DashboardLayout";
 
 export const PrivateAdmin = () => {
   const { store, dispatch } = useGlobalReducer();
-  const urlApi = import.meta.env.VITE_BACKEND_URL;
+  const urlApi = import.meta.env.VITE_BACKEND_URL || "";
 
   const [loading, setLoading] = useState(true);
   const [adminInfo, setAdminInfo] = useState(null);

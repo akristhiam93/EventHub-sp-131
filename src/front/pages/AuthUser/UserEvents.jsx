@@ -5,7 +5,7 @@ import { artisticFilter } from "@cloudinary/url-gen/actions/effect";
 import { DashboardLayout } from "../../components/dashboard/DashboardLayout";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 const geoApiKey = import.meta.env.VITE_GEOCODING_API_KEY
 
 export const UserEvents = () => {
