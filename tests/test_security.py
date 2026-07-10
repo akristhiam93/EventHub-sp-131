@@ -24,6 +24,10 @@ class SecurityFlowTests(unittest.TestCase):
         self.context.pop()
 
     def test_roles_and_password_hashing(self):
+        # Public event details must not require a user token.
+        self.assertEqual(self.client.get("/api/events/999/comments").status_code, 404)
+        self.assertEqual(self.client.get("/api/event/event-promotor/999").status_code, 404)
+
         response = self.client.post("/api/users", json={
             "name": "Ana", "email": "ana@example.com", "password": "secret"
         })

@@ -12,6 +12,9 @@ api = Blueprint('user', __name__,)
 
 @api.before_request
 def require_user_role():
+    # Event details must remain visible before a user signs in.
+    if request.endpoint in {"user.get_event_comments", "user.get_event_promotor_by_id"}:
+        return None
     verify_jwt_in_request()
     if current_role() != "user":
         return jsonify({"message": "Se requiere una cuenta de usuario"}), 403

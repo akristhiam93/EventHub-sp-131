@@ -35,7 +35,7 @@ app.url_map.strict_slashes = False
 configured_origins = os.getenv("CORS_ORIGINS", "").strip()
 if configured_origins:
     allowed_origins = [origin.strip() for origin in configured_origins.split(",") if origin.strip()]
-elif ENV == "development":
+elif ENV == "development" or os.getenv("CODESPACES") == "true":
     allowed_origins = "*"
 else:
     allowed_origins = None
