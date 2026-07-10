@@ -5,6 +5,8 @@ export const initialStore = () => {
     tokenUser: localStorage.getItem("tokenUser") || "",
     userAuth: localStorage.getItem("userAuth") === "true",
     privateUser: null,
+    savedEventsCount: 0,
+    assistingEventsCount: 0,
     tokenAdmin: localStorage.getItem("tokenAdmin") || "",
     adminAuth: localStorage.getItem("adminAuth") === "true",
   };
@@ -47,12 +49,21 @@ export default function storeReducer(store, action = {}) {
         privateUser: action.payload,
       };
 
+    case "SET_USER_ACTIVITY_COUNTS":
+      return {
+        ...store,
+        savedEventsCount: action.payload.saved,
+        assistingEventsCount: action.payload.assisting,
+      };
+
     case "USER_LOGOUT":
       return {
         ...store,
         tokenUser: "",
         userAuth: false,
         privateUser: null,
+        savedEventsCount: 0,
+        assistingEventsCount: 0,
       };
 
     case "ADD_TOKEN_ADMIN":

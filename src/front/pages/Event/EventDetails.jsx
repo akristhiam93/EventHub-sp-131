@@ -138,6 +138,7 @@ export const EventDetails = () => {
             .then((resp) => {
                 if (!resp.ok) throw new Error();
                 setMessageInfo("Asistencia confirmada correctamente");
+                window.dispatchEvent(new Event("user-activity-updated"));
             })
             .catch(() => setMessageInfo("Ya confirmaste asistencia o no se pudo procesar"));
     };

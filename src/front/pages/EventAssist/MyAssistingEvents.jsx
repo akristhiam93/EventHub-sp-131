@@ -53,6 +53,7 @@ export const MyAssistingEvents = () => {
             .then((resp) => {
                 if (!resp.ok) throw new Error();
                 getMyEvents();
+                window.dispatchEvent(new Event("user-activity-updated"));
             })
             .catch(() => {
                 alert("No se pudo cancelar la asistencia");

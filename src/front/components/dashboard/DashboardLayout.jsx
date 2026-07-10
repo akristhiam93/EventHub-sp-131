@@ -1,5 +1,5 @@
 import { NavLink, useNavigate, Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 
 export const DashboardLayout = ({
@@ -15,12 +15,48 @@ export const DashboardLayout = ({
   const [openNotifications, setOpenNotifications] = useState(false);
   const { store, dispatch } = useGlobalReducer();
 
+  useEffect(() => {
+    if (role !== "user") return undefined;
+
+    const token = localStorage.getItem("tokenUser");
+    if (!token) return undefined;
+
+    const loadActivityCounts = async () => {
+      try {
+        const headers = { Authorization: `Bearer ${token}` };
+        const [savedResponse, assistingResponse] = await Promise.all([
+          fetch(`${import.meta.env.VITE_BACKEND_URL || ""}/api/user/saved-events`, { headers }),
+          fetch(`${import.meta.env.VITE_BACKEND_URL || ""}/api/assisting-events`, { headers }),
+        ]);
+        if (!savedResponse.ok || !assistingResponse.ok) return;
+
+        const [saved, assisting] = await Promise.all([
+          savedResponse.json(),
+          assistingResponse.json(),
+        ]);
+        dispatch({
+          type: "SET_USER_ACTIVITY_COUNTS",
+          payload: {
+            saved: saved.events?.length || 0,
+            assisting: assisting.events?.length || 0,
+          },
+        });
+      } catch {
+        // The dashboard remains usable if activity counters cannot be fetched.
+      }
+    };
+
+    loadActivityCounts();
+    window.addEventListener("user-activity-updated", loadActivityCounts);
+    return () => window.removeEventListener("user-activity-updated", loadActivityCounts);
+  }, [role, dispatch]);
+
   const menus = {
     user: [
       { label: "Dashboard", to: "/user/private", icon: "bi bi-grid" },
       { label: "Eventos", to: "/user/events", icon: "bi bi-calendar-event" },
-      { label: "Guardados", to: "/user/saved-events", icon: "bi bi-bookmark-heart" },
-      { label: "Asistencias", to: "/user/assisting-events", icon: "bi bi-check-circle" },
+      { label: `Guardados (${store.savedEventsCount})`, to: "/user/saved-events", icon: "bi bi-bookmark-heart" },
+      { label: `Asistencias (${store.assistingEventsCount})`, to: "/user/assisting-events", icon: "bi bi-check-circle" },
       { label: "Grupos", to: "/user/groups", icon: "bi bi-people" },
       { label: "Perfiles", to: "/user/profiles", icon: "bi bi-person-lines-fill" },
       { label: "MatchEvents", to: "/discover", icon: "bi bi-fire" },

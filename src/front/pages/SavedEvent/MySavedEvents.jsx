@@ -52,6 +52,7 @@ export const MySavedEvents = () => {
             .then((resp) => {
                 if (!resp.ok) throw new Error();
                 getMySavedEvents();
+                window.dispatchEvent(new Event("user-activity-updated"));
             })
             .catch(() => {
                 alert("No se pudo quitar el evento de guardados");

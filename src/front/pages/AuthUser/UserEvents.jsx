@@ -56,6 +56,7 @@ export const UserEvents = () => {
             .then((resp) => {
                 if (!resp.ok) throw new Error();
                 setMessage("Evento guardado correctamente");
+                window.dispatchEvent(new Event("user-activity-updated"));
             })
             .catch(() => setMessage("Este evento ya está guardado o no se pudo guardar"));
     };
