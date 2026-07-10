@@ -10,6 +10,8 @@ promotor = Blueprint('promotor', __name__,)
 
 @promotor.before_request
 def require_promotor_role():
+    if request.method == "OPTIONS":
+        return None
     if request.endpoint in {"promotor.login_promotor", "promotor.signUp_promotor"}:
         return None
     verify_jwt_in_request()

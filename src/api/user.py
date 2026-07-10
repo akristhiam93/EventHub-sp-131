@@ -12,6 +12,9 @@ api = Blueprint('user', __name__,)
 
 @api.before_request
 def require_user_role():
+    # Browser CORS preflight requests do not include a JWT.
+    if request.method == "OPTIONS":
+        return None
     # Event details must remain visible before a user signs in.
     if request.endpoint in {"user.get_event_comments", "user.get_event_promotor_by_id"}:
         return None

@@ -24,6 +24,13 @@ class SecurityFlowTests(unittest.TestCase):
         self.context.pop()
 
     def test_roles_and_password_hashing(self):
+        preflight = self.client.open("/api/assisting-events", method="OPTIONS", headers={
+            "Origin": "http://localhost:5173",
+            "Access-Control-Request-Method": "GET",
+            "Access-Control-Request-Headers": "authorization",
+        })
+        self.assertEqual(preflight.status_code, 200)
+
         # Public event details must not require a user token.
         self.assertEqual(self.client.get("/api/events/999/comments").status_code, 404)
         self.assertEqual(self.client.get("/api/event/event-promotor/999").status_code, 404)

@@ -10,6 +10,8 @@ admins = Blueprint('admins', __name__)
 
 @admins.before_request
 def require_admin_role():
+    if request.method == "OPTIONS":
+        return None
     if request.endpoint == "admins.login_admin":
         return None
     verify_jwt_in_request()
